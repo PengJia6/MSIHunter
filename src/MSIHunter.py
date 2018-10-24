@@ -1,17 +1,19 @@
 #=============================================================================
 # Project : MSIhunter0.0.1
 # Py Name: MSIHunter
-# Author : 0.0.1
+# Author : Peng Jia
 # Date : 18-10-23
 # Email : pengjia@stu.xjtu.edu.cn 
 # Description : 'main of the project'
 #=============================================================================
 import pysam
 import os
+import collections
 import pandas as pd
-
-MicroSatellite = pd.DataFrame()
-Distribution = {}
+import numpy as np
+from src.bam2dis import bam2dis
+from src.globalVar import *
+chrs=["chr"+str(i) for i in range(1,23)]+["chrX","chrY"]
 def optInit():
     """
     argument procress
@@ -44,22 +46,24 @@ def optInit():
 def loadbed():
     print()
 def loadMicrosatellite(pathMicosatellite):
+    windowSize=100000
     print("[MSIHunter INFO] Loading Microsatellite file from " + pathMicosatellite+" ...")
-    MicroSatellite=pd.read_table(pathMicosatellite,index_col=0)
-
-    print(MicroSatellite)
+    dfMicroSatellite=pd.read_table(pathMicosatellite)
+    for index,row in dfMicroSatellite.iterrows():
+        chrID=row["chr"]
+        if chrID not in MicroSatellite :MicroSatellite[chrID]={}
+        pos=row["pos"]
+        MicroSatellite[chrID][pos]=[row["motif"],row["motifLen"],row["repeatTimes"],row["prefix"],row["suffix"]]
+        """
+        0: motif
+        1: motifLen
+        2: repeatTimes
+        3: prefix
+        4: suffix
+        """
+    # print(MicroSatellite[chrID].keys())
     print("[MSIHunter INFO] Loading Microsatellite successfully")
-def bam2dis(bam):
-    print("[MSIHunter INFO] Loading bam file from "+bam+" ...")
-    print("[MSIHunter INFO] Loading bam file successfully")
 
-
-
-
-
-
-
-    print()
 def main():
     import os
     argument=optInit() #argument procress
