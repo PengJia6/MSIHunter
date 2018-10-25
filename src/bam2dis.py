@@ -27,7 +27,7 @@ def getRepeatTimes(alignment,motif,motifLen,prefix,suffix):
             start =readString.find(motif, start)+motifLen
         if (motifLen==1 and count>=1) or (motifLen>1 and count>=1):
             if start==readString.find(suffix, start):
-                print(count, "    ", prefix,motif, suffix,repeat)
+                # print(count, "    ", prefix,motif, suffix,repeat)
                 return count
         prefixState=readString.find(prefix,prefixState+1)
     return -4
@@ -47,15 +47,33 @@ def getRepeatTimes(alignment,motif,motifLen,prefix,suffix):
     #             return count
     #     prefixState=readString.find(prefix,prefixState+1)
     # return -4
+def writeDistribution():
+    Distribution = getDistribution()
+    MicroSatellite = getMicroSatellite()
+    Arguments = getArguments()
+    file=open(Arguments["outPreF"]+".dis",'a')
+    for chrId in Distribution:
+        for pos,dis in Distribution[chrId].items():
+            # print(chrId,pos,dis)
+            info=MicroSatellite[chrId][pos]
+            file.write(chrId+"\t"+str(pos)+"\t"+info[3].lower()+info[0]+str(info[2])+info[4].lower()+"\n"+
+                       "\t".join([str(key)+":"+str(dis[key]) for key in sorted(list(dis.keys()))])+"\n")
+            file.write("\t".join([chrId,str(pos),info[3],info[0],str(info[2]),info[4]])+"\n"+
+                       " ".join([str(key)+":"+str(dis[key]) for key in sorted(list(dis.keys()))])+"\n")
+    # print("")
+    file.close()
 def bam2dis(bamPath):
-    print("[MSIHunter INFO] Loading bam file from " + bamPath + " ...")
+    print("[MSIHunter INFO] Procressing bam file from " + bamPath + " ...")
+    Distribution=getDistribution()
     MicroSatellite=getMicroSatellite()
     Arguments=getArguments()
     bam = pysam.AlignmentFile(bamPath, "rb")
     if not bam.check_index():
-        print("[Error:]: Not index file for " + bamPath + " ,Please give a valid bam index!")
+        print("[Error:**]: Not index file for " + bamPath + " ,Please give a valid bam index!")
         return 0
     for chrId in MicroSatellite:
+        setDistribution({})
+        Distribution[chrId]={}
         for posStart,info in MicroSatellite[chrId].items():
             motifLen=int(info[1])
             motif=info[0]
@@ -73,10 +91,29 @@ def bam2dis(bamPath):
                 # print(alignment)
                 alignmentList.append(alignment)
             if len(alignmentList) <Arguments["minimum_support_reads"]:continue
+            repeatTimesDict={}
             for alignment in alignmentList:
                 if alignment.is_unmapped:continue
                 thisRepeatTimes=getRepeatTimes(alignment,motif,motifLen,prefix,suffix)
                 if thisRepeatTimes<0:continue
+                if thisRepeatTimes not in repeatTimesDict:repeatTimesDict[thisRepeatTimes]=0
+                repeatTimesDict[thisRepeatTimes] += 1
+            if sum(repeatTimesDict.values())<Arguments["minimum_support_reads"]:continue
+            else:
+                Distribution[chrId][posStart]=repeatTimesDict
+            if len(Distribution[chrId])>10:
+                setDistribution(Distribution)
+                writeDistribution()
+                Distribution[chrId]={}
+        if len(Distribution[chrId])!=0:
+            setDistribution(Distribution)
+            writeDistribution()
+            Distribution[chrId]={}
+
+
+
+
+
     print("[MSIHunter INFO] Loading bam file successfully")
 if __name__ == "__main__":
     # print(MicroSatellite)

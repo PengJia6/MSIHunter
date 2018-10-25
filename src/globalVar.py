@@ -36,6 +36,12 @@ def setArguments( value):
 def getArguments():
     global Arguments
     return Arguments
+def setDistribution( value):
+    global Distribution
+    Distribution = value
+def getDistribution():
+    global Distribution
+    return Distribution
 
 
 if __name__ == "__main__":
