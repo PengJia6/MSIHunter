@@ -19,10 +19,12 @@
 #       return GlobalVar.mq_client
 global MicroSatellite, Distribution, Arguments
 def golInit():
-    global MicroSatellite, Distribution, Arguments
+    global MicroSatellite, Distribution, Arguments,ShiftProbability
     MicroSatellite = {}
     Distribution = {}
     Arguments = {}
+    ShiftProbability = {}
+
 
 def setMicroSatellite( value):
     global Arguments
@@ -42,6 +44,12 @@ def setDistribution( value):
 def getDistribution():
     global Distribution
     return Distribution
+def setShiftProbability( value):
+    global ShiftProbability
+    ShiftProbability = value
+def getShiftProbability():
+    global ShiftProbability
+    return ShiftProbability
 
 
 if __name__ == "__main__":

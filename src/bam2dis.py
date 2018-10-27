@@ -51,29 +51,48 @@ def writeDistribution():
     Distribution = getDistribution()
     MicroSatellite = getMicroSatellite()
     Arguments = getArguments()
+    ShiftProbability=getShiftProbability()
     file=open(Arguments["outPreF"]+".dis",'a')
+    filePro=open(Arguments["outPreF"]+".pro",'a')
     for chrId in Distribution:
         for pos,dis in Distribution[chrId].items():
             # print(chrId,pos,dis)
             info=MicroSatellite[chrId][pos]
-            file.write(chrId+"\t"+str(pos)+"\t"+info[3].lower()+info[0]+str(info[2])+info[4].lower()+"\n"+
-                       "\t".join([str(key)+":"+str(dis[key]) for key in sorted(list(dis.keys()))])+"\n")
+            # file.write(chrId+"\t"+str(pos)+"\t"+info[3].lower()+info[0]+str(info[2])+info[4].lower()+"\n"+
+            #            "\t".join([str(key)+":"+str(dis[key]) for key in sorted(list(dis.keys()))])+"\n")
             file.write("\t".join([chrId,str(pos),info[3],info[0],str(info[2]),info[4]])+"\n"+
                        " ".join([str(key)+":"+str(dis[key]) for key in sorted(list(dis.keys()))])+"\n")
-    # print("")
+            filePro.write("\t".join([chrId,str(pos),info[3],info[0],str(info[2]),info[4],str(ShiftProbability[chrId][pos][0]),str(ShiftProbability[chrId][pos][1])])+"\n")
     file.close()
+    filePro.close()
+def calcuShiftProbability(disDict,refRepeatTimes):
+    insShfit=0;delShfit=0;normal=0
+    # print(refRepeatTimes)
+    # print(disDict)
+    for rpt in disDict:
+        if rpt-refRepeatTimes>0:
+            insShfit=insShfit+(rpt-refRepeatTimes)
+            normal=normal+rpt
+        else:
+            delShfit=delShfit+(refRepeatTimes-rpt)
+            normal = normal + rpt
+    # print(insShfit,delShfit,normal)
+    return round(delShfit/(insShfit+delShfit+normal),4),round(insShfit/(insShfit+delShfit+normal),4)
+
 def bam2dis(bamPath):
     print("[MSIHunter INFO] Procressing bam file from " + bamPath + " ...")
     Distribution=getDistribution()
     MicroSatellite=getMicroSatellite()
     Arguments=getArguments()
     bam = pysam.AlignmentFile(bamPath, "rb")
+    ShiftProbability=getShiftProbability()
     if not bam.check_index():
         print("[Error:**]: Not index file for " + bamPath + " ,Please give a valid bam index!")
         return 0
     for chrId in MicroSatellite:
         setDistribution({})
         Distribution[chrId]={}
+        ShiftProbability[chrId]={}
         for posStart,info in MicroSatellite[chrId].items():
             motifLen=int(info[1])
             motif=info[0]
@@ -101,19 +120,19 @@ def bam2dis(bamPath):
             if sum(repeatTimesDict.values())<Arguments["minimum_support_reads"]:continue
             else:
                 Distribution[chrId][posStart]=repeatTimesDict
-            if len(Distribution[chrId])>10:
-                setDistribution(Distribution)
-                writeDistribution()
-                Distribution[chrId]={}
+                ShiftProbability[chrId][posStart]=calcuShiftProbability(repeatTimesDict,MicroSatellite[chrId][posStart][2])
+            if len(Distribution[chrId])>100:
+                setDistribution(Distribution);
+                setShiftProbability(ShiftProbability)
+                writeDistribution();
+                Distribution[chrId]={};
+                setShiftProbability[chrId]={}
         if len(Distribution[chrId])!=0:
-            setDistribution(Distribution)
-            writeDistribution()
-            Distribution[chrId]={}
-
-
-
-
-
+            setDistribution(Distribution);
+            setShiftProbability(ShiftProbability)
+            writeDistribution();
+            Distribution[chrId] = {};
+            ShiftProbability[chrId] = {}
     print("[MSIHunter INFO] Loading bam file successfully")
 if __name__ == "__main__":
     # print(MicroSatellite)
