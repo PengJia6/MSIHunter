@@ -117,7 +117,7 @@ def bam2dis(bamPath):
                 if thisRepeatTimes<0:continue
                 if thisRepeatTimes not in repeatTimesDict:repeatTimesDict[thisRepeatTimes]=0
                 repeatTimesDict[thisRepeatTimes] += 1
-            if sum(repeatTimesDict.values())<Arguments["minimum_support_reads"]:continue
+            if sum(qqw.values())<Arguments["minimum_support_reads"]:continue
             else:
                 Distribution[chrId][posStart]=repeatTimesDict
                 ShiftProbability[chrId][posStart]=calcuShiftProbability(repeatTimesDict,MicroSatellite[chrId][posStart][2])
