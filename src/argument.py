@@ -19,7 +19,7 @@ def optInit():
                         help="prefix of the output")
     parser.add_argument('-m','--Microsatellite',required=True,type=str,nargs=1,default=["NA"],help="path of the Microsatellite")
     parser.add_argument('-bed', '--bed_region', type=str, nargs=1, default=["NA"], help="only procress read in this bed region")
-    parser.add_argument('-q', '--minimum_mapping_quality', type=int, nargs=1, default=[10],
+    parser.add_argument('-q', '--minimum_mapping_quality', type=int, nargs=1, default=[1],
                         help="minimum mapping quality of read [default:10]")
     parser.add_argument('-s', '--minimum_support_reads', type=int, nargs=1, default=[10],
                         help="minimum mapping quality of read [default:10]")

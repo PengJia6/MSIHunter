@@ -9,6 +9,8 @@
 import sys
 import datetime
 sys.path.append(sys.path[0][:-3])
+sys.path.append(sys.path[0][:-3]+"data")
+print(sys.path[0][:-3]+"data/")
 from src.argument import optInit
 from src.bam2dis import bam2dis
 from src.loadConfig import loadMicrosatellite,loadbed
@@ -33,7 +35,7 @@ def main():
     if os.path.exists(Arguments["Microsatellite"]):
         loadMicrosatellite(Arguments["Microsatellite"])
     else:
-        print('[MSIHunter ERROR] Fail to load Microsatellite from "'+Arguments["Microsatellite"]+' "')
+        print('[MSIHunter ERROR] Fail to load Microsatellite from "'+Arguments["Microsatellite"]+'"')
         return -1
     if os.path.exists(Arguments["inputBam"]):
       bam2dis(Arguments["inputBam"])
@@ -46,6 +48,5 @@ if __name__ == "__main__":
     endTime = datetime.datetime.now()
     print(endTime)
     print(endTime-startTime)
-    # print()
 
 

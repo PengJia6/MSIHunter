@@ -1,10 +1,10 @@
 #=============================================================================
 # Project : MSIhunter0.0.1
-# Py Name: bam2dis
-# Author : Peng Jia
-# Date : 18-10-24
+# Py Name: bam2dis2
+# Author : Peng jia
+# Date : 18-11-14
 # Email : pengjia@stu.xjtu.edu.cn 
-# Description : 'conver bam file to a distribution in microsatellites regions'
+# Description : ''
 #=============================================================================
 import pysam
 import pandas as pd
@@ -75,16 +75,15 @@ def calcuShiftProbability(disDict,refRepeatTimes):
     for rpt in disDict:
         if rpt-refRepeatTimes>0:
             insShfit=insShfit+(rpt-refRepeatTimes)
-            normal=normal+rpt*disDict[rpt]
+            normal=normal+rpt
         else:
             delShfit=delShfit+(refRepeatTimes-rpt)
-            normal = normal + rpt*disDict[rpt]
+            normal = normal + rpt
     # print(insShfit,delShfit,normal)
     return round(delShfit/(insShfit+delShfit+normal),4),round(insShfit/(insShfit+delShfit+normal),4)
 
 def bam2dis(bamPath):
     print("[MSIHunter INFO] Procressing bam file from " + bamPath + " ...")
-    # print("HHH")
     Distribution=getDistribution()
     MicroSatellite=getMicroSatellite()
     Arguments=getArguments()
@@ -94,7 +93,7 @@ def bam2dis(bamPath):
         print("[Error:**]: Not index file for " + bamPath + " ,Please give a valid bam index!")
         return 0
     for chrId in MicroSatellite:
-        # setDistribution({})
+        setDistribution({})
         Distribution[chrId]={}
         ShiftProbability[chrId]={}
         for posStart,info in MicroSatellite[chrId].items():
@@ -106,25 +105,40 @@ def bam2dis(bamPath):
             posEnd=posStart+motifLen*repeatTimes
             queryStrat=posStart-5
             queryEnd=posEnd+5
+            # print(queryStrat,queryEnd)
             alignmentList=[]
+            # print()
+            # print(chrId, queryStrat,queryEnd)
             for alignment in bam.fetch(chrId, queryStrat,
                                        queryEnd):  # (refName,start,end): read which at least has a base between  start+1 and end-1
+                # print(alignment)
+
                 alignmentList.append(alignment)
             if len(alignmentList) <Arguments["minimum_support_reads"]:continue
             repeatTimesDict={}
+
             for alignment in alignmentList:
                 if alignment.is_unmapped:continue
                 thisRepeatTimes=getRepeatTimes(alignment,motif,motifLen,prefix,suffix)
                 if thisRepeatTimes<0:continue
                 if thisRepeatTimes not in repeatTimesDict:repeatTimesDict[thisRepeatTimes]=0
                 repeatTimesDict[thisRepeatTimes] += 1
+
             if sum(repeatTimesDict.values())<Arguments["minimum_support_reads"]:continue
             else:
                 Distribution[chrId][posStart]=repeatTimesDict
-                # print(MicroSatellite[chrId][posStart][2])
-                ShiftProbability[chrId][posStart]=calcuShiftProbability(repeatTimesDict,MicroSatellite[chrId][posStart][2])
 
-    writeDistribution()
+                ShiftProbability[chrId][posStart]=calcuShiftProbability(repeatTimesDict,MicroSatellite[chrId][posStart][2])
+            if len(Distribution[chrId])>100:
+                setDistribution(Distribution);
+                setShiftProbability(ShiftProbability)
+                writeDistribution();
+                Distribution[chrId]={};
+                # setShiftProbability[chrId]={}
+        if len(Distribution[chrId])!=0:
+            setDistribution(Distribution);
+            setShiftProbability(ShiftProbability)
+            writeDistribution();
     with open(Arguments["outPreF"] + ".pro", 'r+') as f:
         old = f.read()
         f.seek(0)
@@ -140,7 +154,7 @@ def bam2dis(bamPath):
         testNum+=1
         if float(lineinfo[-1])>float(lineinfo[-2]):
             unstableNum+=1
-    # print(testNum,unstableNum)
+    print(testNum,unstableNum)
     print("[MSIHunter INFO] Loading bam file successfully")
 if __name__ == "__main__":
     # print(MicroSatellite)
