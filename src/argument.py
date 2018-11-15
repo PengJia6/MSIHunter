@@ -13,11 +13,11 @@ def optInit():
     argument procress
     """
     print("[MSIHunter INFO] Initializing...  ")
-    parser = argparse.ArgumentParser(description='MSIHunter: a Microsatellite Instability(MSI) detection tools')
-    parser.add_argument('-i','--input_bam',required=True,type=str,nargs=1,default=["NA"],help="input bam file")
+    parser = argparse.ArgumentParser(description='MSIHunter: a Microsatellite Instability(MSI) detection tools using only tumor sequencing data')
+    parser.add_argument('-i','--input_bam',required=True,type=str,nargs=1,default=["NA"],help="input bam file [required]")
     parser.add_argument('-o', '--output_prefix', required=True, type=str, nargs=1, default=["NA"],
-                        help="prefix of the output")
-    parser.add_argument('-m','--Microsatellite',required=True,type=str,nargs=1,default=["NA"],help="path of the Microsatellite")
+                        help="prefix of the output [required]")
+    parser.add_argument('-m','--Microsatellite',required=True,type=str,nargs=1,default=["NA"],help="path of the Microsatellite [required]")
     parser.add_argument('-c', '--case_id', type=str, nargs=1, default=["NA"], help="case id")
     parser.add_argument('-q', '--minimum_mapping_quality', type=int, nargs=1, default=[10],
                         help="minimum mapping quality of read [default:10]")

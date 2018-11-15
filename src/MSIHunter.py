@@ -10,7 +10,6 @@ import sys
 import datetime
 sys.path.append(sys.path[0][:-3])
 sys.path.append(sys.path[0][:-3]+"data")
-print(sys.path[0][:-3]+"data/")
 from src.argument import optInit
 from src.bam2dis import bam2dis
 from src.loadConfig import loadMicrosatellite,loadbed
