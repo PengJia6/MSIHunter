@@ -141,7 +141,14 @@ def bam2dis(bamPath):
         if float(lineinfo[-1])>float(lineinfo[-2]):
             unstableNum+=1
     # print(testNum,unstableNum)
-    print("[MSIHunter INFO] Loading bam file successfully")
+    file=open(Arguments["outPreF"],"w")
+    file.write(
+        "Case: "+Arguments["CaseID"]+"\n"
+        "Avaliable locis : "+str(testNum)+"\n"
+        "Unstable locis : "+str(unstableNum)+"\n"
+        "MSI score : "+str(round(100*unstableNum/testNum,4))+"%\n"
+    )
+    print("[MSIHunter INFO] Procressing bam file successfully")
 if __name__ == "__main__":
     # print(MicroSatellite)
     print()

@@ -30,8 +30,8 @@ def main():
     for filesuffix in [".dis","",".pro"]:
         file=open(Arguments["outPreF"]+filesuffix,"w")
         file.close()
-    if Arguments["inputBed"]!="NA":
-        loadbed()
+    # if Arguments["inputBed"]!="NA":
+    #     loadbed()
     if os.path.exists(Arguments["Microsatellite"]):
         loadMicrosatellite(Arguments["Microsatellite"])
     else:
@@ -42,11 +42,11 @@ def main():
     else:
         print("[Error:**]: Not such a bam file in "+Arguments["inputBam"] + " ,Please give a valid bam file!")
 if __name__ == "__main__":
-    startTime=datetime.datetime.now()
-    print(startTime)
+    # startTime=datetime.datetime.now()
+    # print(startTime)
     main()
-    endTime = datetime.datetime.now()
-    print(endTime)
-    print(endTime-startTime)
+    # endTime = datetime.datetime.now()
+    # print(endTime)
+    # print(endTime-startTime)
 
 
