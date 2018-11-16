@@ -70,21 +70,20 @@ def writeDistribution():
     filePro.close()
 def calcuShiftProbability(disDict,refRepeatTimes):
     insShfit=0;delShfit=0;normal=0
-    # print(refRepeatTimes)
-    # print(disDict)
+    print(refRepeatTimes)
+    print(disDict)
     for rpt in disDict:
         if rpt-refRepeatTimes>0:
-            insShfit=insShfit+(rpt-refRepeatTimes)
-            normal=normal+rpt*disDict[rpt]
+            insShfit=insShfit+(rpt-refRepeatTimes)*disDict[rpt]
+            normal=normal+rpt*disDict[rpt]-insShfit
         else:
-            delShfit=delShfit+(refRepeatTimes-rpt)
-            normal = normal + rpt*disDict[rpt]
-    # print(insShfit,delShfit,normal)
+            delShfit=delShfit+(refRepeatTimes-rpt)*disDict[rpt]
+            normal = normal + rpt*disDict[rpt]-delShfit
+    print(insShfit,delShfit,normal)
     return round(delShfit/(insShfit+delShfit+normal),4),round(insShfit/(insShfit+delShfit+normal),4)
 
 def bam2dis(bamPath):
     print("[MSIHunter INFO] Procressing bam file from " + bamPath + " ...")
-    # print("HHH")
     Distribution=getDistribution()
     MicroSatellite=getMicroSatellite()
     Arguments=getArguments()

@@ -19,10 +19,10 @@ def optInit():
                         help="prefix of the output [required]")
     parser.add_argument('-m','--Microsatellite',required=True,type=str,nargs=1,default=["NA"],help="path of the Microsatellite [required]")
     parser.add_argument('-c', '--case_id', type=str, nargs=1, default=["NA"], help="case id")
-    parser.add_argument('-q', '--minimum_mapping_quality', type=int, nargs=1, default=[10],
+    parser.add_argument('-q', '--minimum_mapping_quality', type=int, nargs=1, default=[0],
                         help="minimum mapping quality of read [default:10]")
-    parser.add_argument('-s', '--minimum_support_reads', type=int, nargs=1, default=[10],
-                        help="minimum support reads of a microsatellites [default:10]")
+    parser.add_argument('-s', '--minimum_support_reads', type=int, nargs=1, default=[20],
+                        help="minimum support reads of an available microsatellite [default:10]")
     parser.add_argument('-t','--tumor_type',type=str,nargs=1,default=["CRC"],help="tumor type of the case(CRC,UCEC,STAD)")
     # parser.add_argument("-v1", "--verbose", help="increase output verbosity",
     #                     action="store_true")

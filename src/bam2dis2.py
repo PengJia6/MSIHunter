@@ -70,8 +70,8 @@ def writeDistribution():
     filePro.close()
 def calcuShiftProbability(disDict,refRepeatTimes):
     insShfit=0;delShfit=0;normal=0
-    # print(refRepeatTimes)
-    # print(disDict)
+    print(refRepeatTimes)
+    print(disDict)
     for rpt in disDict:
         if rpt-refRepeatTimes>0:
             insShfit=insShfit+(rpt-refRepeatTimes)
@@ -79,7 +79,7 @@ def calcuShiftProbability(disDict,refRepeatTimes):
         else:
             delShfit=delShfit+(refRepeatTimes-rpt)
             normal = normal + rpt
-    # print(insShfit,delShfit,normal)
+    print(insShfit,delShfit,normal)
     return round(delShfit/(insShfit+delShfit+normal),4),round(insShfit/(insShfit+delShfit+normal),4)
 
 def bam2dis(bamPath):
