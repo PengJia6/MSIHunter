@@ -22,10 +22,12 @@ def argumentProcress():
     """
     global arguments
     parser = argparse.ArgumentParser(description='Select discriminative microsatellites for each type of tumor! ')
-    parser.add_argument('-train','--train_set_for_sites_selection',required=True,type=str,nargs=1,help="train set information [required]")
+    parser.add_argument('-train','--train_set_for_sites_selection',required=True,type=str,nargs=1,
+                        help="train set information [required]")
     parser.add_argument('-w', '--workspace', required=True, type=str, nargs=1, default=["./workspace"],
                         help="prefix of the output [required]")
-    parser.add_argument('-m','--Microsatellite',required=True,type=str,nargs=1,default=["NA"],help="path of the Microsatellite [required]")
+    parser.add_argument('-m','--Microsatellite',required=True,type=str,nargs=1,default=["NA"],
+                        help="path of the Microsatellite [required]")
     parser.add_argument('-t', '--threads', type=int, nargs=1, default=[4],
                         help="Number of additional threads to use [default:4]")
     parser.add_argument('-q', '--minimum_mapping_quality', type=int, nargs=1, default=[20],
@@ -55,7 +57,8 @@ def argumentProcress():
         ErrorStat = True
 
     if os.path.exists(arguments["workspace"]):
-        print('[ERROR] The workspace is still exist! in case of overwrite files in this workspace, please give a new work space' )
+        print('[ERROR] The workspace is still exist! in case of overwrite files in this workspace,'
+              ' please give a new work space')
         ErrorStat = True
         if ErrorStat :return False
     else:
@@ -89,7 +92,7 @@ def procressTrainSet():
     global TrainInfo,arguments,trainDict
     print("[INFO] Loading train file from " + arguments["train"] + " ...")
     TrainInfo=pd.read_csv(arguments["train"],index_col=0,dtype="str")
-    columns=["case","bamPath","cancerType","MSI"]
+    columns=["bamPath","cancerType","MSI"]
     errorItem = []
     for item in columns:
         if item not in TrainInfo.columns:
@@ -179,7 +182,7 @@ def procressOneBam(caseid):
         lociRes=pd.DataFrame()
         # print(infoTrain)
         print("[INFO] procressing "+str(caseid)+"...")
-        file=open(arguments["workspace"]+"dis/"+str(caseid)+"_"+infoTrain["case"]+".dis","w")
+        file=open(arguments["workspace"]+"dis/"+str(caseid)+".dis","w")
         file.close()
         bam=pysam.AlignmentFile(infoTrain["bamPath"], "rb")
         Distribution={}
@@ -197,7 +200,8 @@ def procressOneBam(caseid):
             queryEnd = posEnd + 5
             alignmentList = []
             for alignment in bam.fetch(chrId, queryStrat,
-                                       queryEnd):  # (refName,start,end): read which at least has a base between  start+1 and end-1
+                                       queryEnd):
+                # (refName,start,end): read which at least has a base between  start+1 and end-1
                 alignmentList.append(alignment)
             if len(alignmentList) < arguments["minimum_support_reads"]: continue
             repeatTimesDict = {}
@@ -216,20 +220,20 @@ def procressOneBam(caseid):
                 # print(list(repeatTimesDict.keys())[np.argmax(np.array(repeatTimesDict.values()))])
                 lociRes.loc[id,"rpl"]=list(repeatTimesDict.keys())[np.argmax(np.array(repeatTimesDict.values()))]
             if curentMSNum%1000==0:
-                file = open(arguments["workspace"] + "dis/" + str(caseid) + "_" + infoTrain["case"] + ".dis", "a")
+                file = open(arguments["workspace"] + "dis/" + str(caseid) + ".dis", "a")
                 for id, dis in Distribution.items():
                     file.write(str(id) + "\n" +
                                " ".join([str(key) + ":" + str(dis[key]) for key in sorted(list(dis.keys()))]) + "\n")
                 file.close()
                 Distribution={}
         if len(Distribution)>0:
-            file = open(arguments["workspace"] + "dis/" + str(caseid) + "_" + infoTrain["case"] + ".dis", "a")
+            file = open(arguments["workspace"] + "dis/" + str(caseid)  + ".dis", "a")
             for id, dis in Distribution.items():
                 file.write(str(id) + "\n" +
                            " ".join([str(key) + ":" + str(dis[key]) for key in sorted(list(dis.keys()))]) + "\n")
             file.close()
         lociRes.index.name="id"
-        lociRes.to_csv(arguments["workspace"] + "dis/" + str(caseid) + "_" + infoTrain["case"] + ".pro")
+        lociRes.to_csv(arguments["workspace"] + "dis/" + str(caseid) + ".pro")
         return True
     except:
         print("[INFO] procressing " + str(caseid) + " ERROR!!")
@@ -243,24 +247,34 @@ def moreCoverage():
             data=TrainInfo[TrainInfo["cancerType"]==cancer]
             caseNum=len(data)
             for caseid,infoTrain in data.iterrows():
-                lociRes=pd.read_csv(arguments["workspace"] + "dis/" + str(caseid) + "_" + infoTrain["case"] + ".pro",index_col=0)
+                lociRes=pd.read_csv(arguments["workspace"] + "dis/" + str(caseid)  + ".pro",
+                                    index_col=0)
                 for loci,info in lociRes.iterrows():
-                    LocisMatrix.loc[caseid,loci]=info["p"]
+                    LocisMatrix.loc[caseid,loci]=round(info["p"],4)
+                if infoTrain["MSI"] == "MSI-H":
+                    continue
+                for loci, info in lociRes.iterrows():
                     indelMatrix.loc[caseid,loci]=info["rpl"]
-            LocisMatrix.to_csv(arguments["workspace"] + "originalLocisMatrix" + cancer + ".csv")
-            indelMatrix.to_csv(arguments["workspace"] + "originalRepeatTimesMatrix" + cancer + ".csv")
+            LocisMatrix.to_csv(arguments["workspace"] + "originalLocisMatrix_" + cancer + ".csv")
+            indelMatrix.to_csv(arguments["workspace"] + "originalRepeatTimesMatrix_" + cancer + ".csv")
             fewerCoverageLociList=[]
             for loci in LocisMatrix.columns:
                 if len(LocisMatrix[loci].dropna())*3<caseNum:
                     fewerCoverageLociList.append(loci)
+            fewerCoverageLociList=[i for i in fewerCoverageLociList if i in indelMatrix.index]
             LocisMatrix.drop(fewerCoverageLociList,axis=1,inplace=True)
+            print("[INFO] There are " +str(len(LocisMatrix.columns))+" Microsatellites detected in this train set.")
             indelMatrix.drop(fewerCoverageLociList, axis=1, inplace=True)
             mutationParameterHigh=[]
             for loci in indelMatrix.columns:
-                if abs(np.mean(indelMatrix[loci].dropna())-dfMicroSatellite.loc[loci,"repeatTimes"])>0.1 or np.std(indelMatrix[loci].dropna())>1:
+                if abs(np.mean(indelMatrix[loci].dropna())-dfMicroSatellite.loc[loci,"repeatTimes"])>0.1 \
+                        or \
+                        np.std(indelMatrix[loci].dropna())>1:
                     mutationParameterHigh.append(loci)
             LocisMatrix.drop(mutationParameterHigh, axis=1, inplace=True)
-            LocisMatrix.to_csv(arguments["workspace"]+"finalLocisMatrix"+cancer+".csv")
+            print("[INFO] There are " + str(len(LocisMatrix.columns)) +
+                  " Microsatellites after filtering in this train set.")
+            LocisMatrix.to_csv(arguments["workspace"]+"finalLocisMatrix_"+cancer+".csv")
         return True
     except:
         print("[ERROR] error when processing moreCoverage()")
@@ -271,16 +285,17 @@ def moreCorrelation():
     global arguments, TrainInfo, trainDict
     try:
         for cancer in trainDict:
-            LocisMatrix=pd.read_csv(arguments["workspace"]+"finalLocisMatrix"+cancer+".csv",index_col=0)
+            LocisMatrix=pd.read_csv(arguments["workspace"]+"finalLocisMatrix_"+cancer+".csv",index_col=0)
             MSIPMatrix = LocisMatrix.loc[trainDict[cancer]["MSI_P"], :]
             MSINMatrix = LocisMatrix.loc[trainDict[cancer]["MSI_N"], :]
             dfSignificantP = pd.DataFrame()
+
             for loci in LocisMatrix.columns:
-                msiNP = np.array(MSINMatrix[loci])
-                msiPP = np.array(MSIPMatrix[loci])
+                msiNP = np.array(MSINMatrix[loci].dropna())
+                msiPP = np.array(MSIPMatrix[loci].dropna())
                 if msiNP.shape[0] < 2 or msiPP.shape[0] < 2: continue
                 ranksumsP = ranksums(msiPP, msiNP)[1]
-                if ranksumsP < 0.5 and msiPP.mean() >= msiNP.mean():
+                if ranksumsP <= 0.05 and msiPP.mean() > msiNP.mean():
                     # print(ranksumsP)
                     series = dfMicroSatellite.loc[loci]
                     nu = msiNP.mean()
@@ -289,13 +304,16 @@ def moreCorrelation():
                     dfSignificantP = dfSignificantP.append(series)
                     dfSignificantP.loc[loci,"threshold"] = round(nu + 3 * msiNP.std(), 4)
                     # print(dfSignificantP)
-            dfSignificantP.to_csv(arguments["workspace"] + "MS_" + cancer + ".csv")
-            return True
+            dfSignificantP = dfSignificantP[["chr", "pos", "motif", "motifLen", "repeatTimes",
+                                             "prefix", "suffix", "threshold"]]
+            print("[INFO] There are " + str(len(dfSignificantP)) +
+                  " Microsatellites discriminative with MSI in this train set.")
+            dfSignificantP.index.name="id"
+            dfSignificantP.to_csv(arguments["workspace"] + "DiscriminativeLocis_" + cancer + ".csv")
+        return True
     except:
         print("[ERROR] error when processing moreCorrelation()")
         return False
-
-
 def main():
     """
     :return:
@@ -318,5 +336,5 @@ def main():
 if __name__ == "__main__":
     global arguments
     sta=main()
-    if sta>1:
+    if sta>1 and sta <4:
         os.system("rm -r "+arguments["workspace"])
