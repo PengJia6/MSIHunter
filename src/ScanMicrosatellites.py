@@ -27,9 +27,9 @@ def argumentProcress():
     parser.add_argument('--maximal_repeat_unit_size', default=[5], type=int, nargs=1,
                         help=" maximal repeat unit size [default: 5]")
     parser.add_argument('--context_length', default=[5], type=int, nargs=1,
-                        help=" size of prefix and suffix in output [default=5]")
-    parser.add_argument('--ranges_of_repeat_times', default=["default: 1-1:10;2-5:5"], type=str, nargs=1,
-                        help="ranges_of_repeat_times [1-1:10;2-5:5]")
+                        help=" size of prefix and suffix in output [default: 5]")
+    parser.add_argument('--ranges_of_repeat_times', default=["1-1:10;2-5:5"], type=str, nargs=1,
+                        help="ranges_of_repeat_times [default: 1-1:10;2-5:5]")
     parser.add_argument('-t', '--threads', type=int, nargs=1, default=[4],
                         help="Number of additional threads to use [default: 4]")
     # parser.add_argument('-q', '--minimum_mapping_quality', type=int, nargs=1, default=[20],
