@@ -38,7 +38,7 @@ def argumentProcress():
                         help="minimum support reads of an available microsatellite [default:20]")
     args = parser.parse_args()
     arguments = {}
-    arguments["input"] = args.input_configure_file[0]
+    arguments["input"] = args.input_configure[0]
     arguments["workspace"] = args.workspace[0] if args.workspace[0][-1] == "/" else args.workspace[0] + "/"
     arguments["Microsatellite"] = args.microsatellites_configure[0]
     arguments["threads"] = args.threads[0]
@@ -305,8 +305,6 @@ def main():
     if not resultOut():
         return 4
     return 0
-
-
 if __name__ == "__main__":
     if main() > 1:
         os.system("rm -r " + arguments["workspace"])
