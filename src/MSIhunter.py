@@ -24,14 +24,14 @@ def argumentProcress():
     parser = argparse.ArgumentParser(description='MSIHunter: a Microsatellite Instability(MSI)'
                                                  ' detection tools using only tumor sequencing data!\n'
                                                  'You can test multiple sample one time in this tools')
-    parser.add_argument('-i', '--input_configure_file', required=True, type=str, nargs=1,
+    parser.add_argument('-i', '--input_configure', required=True, type=str, nargs=1,
                         help="The path of input configure files [required]")
-    parser.add_argument('-w', '--workspace', required=True, type=str, nargs=1, default=["./workspace"],
+    parser.add_argument('-o', '--workspace', required=True, type=str, nargs=1, default=["./workspace"],
                         help="prefix of the output [required]")
-    parser.add_argument('-m', '--Microsatellite_configure', required=True, type=str, nargs=1, default=["NA"],
-                        help="path of the Microsatellite configure files [required]")
+    parser.add_argument('-mc', '--microsatellites_configure', required=True, type=str, nargs=1, default=["NA"],
+                        help="path of the microsatellites configure files [required]")
     parser.add_argument('-t', '--threads', type=int, nargs=1, default=[4],
-                        help="Number of additional threads to use [default:4]")
+                        help="mumber of additional threads to use [default:4]")
     parser.add_argument('-q', '--minimum_mapping_quality', type=int, nargs=1, default=[20],
                         help="minimum mapping quality of read [default:20]")
     parser.add_argument('-s', '--minimum_support_reads', type=int, nargs=1, default=[20],
@@ -40,7 +40,7 @@ def argumentProcress():
     arguments = {}
     arguments["input"] = args.input_configure_file[0]
     arguments["workspace"] = args.workspace[0] if args.workspace[0][-1] == "/" else args.workspace[0] + "/"
-    arguments["Microsatellite"] = args.Microsatellite_configure[0]
+    arguments["Microsatellite"] = args.microsatellites_configure[0]
     arguments["threads"] = args.threads[0]
     arguments["minimum_support_reads"] = args.minimum_support_reads[0]
     arguments["minimum_mapping_quality"] = args.minimum_mapping_quality[0]

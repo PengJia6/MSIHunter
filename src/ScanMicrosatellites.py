@@ -28,10 +28,10 @@ def argumentProcress():
                         help=" maximal repeat unit size [default: 5]")
     parser.add_argument('--context_length', default=[5], type=int, nargs=1,
                         help=" size of prefix and suffix in output [default: 5]")
-    parser.add_argument('--ranges_of_repeat_times', default=["1-1:10;2-5:5"], type=str, nargs=1,
-                        help="ranges_of_repeat_times [default: 1-1:10;2-5:5]")
+    parser.add_argument('--minimum_repeat_times', default=["1-1:10;2-5:5"], type=str, nargs=1,
+                        help="minimum repeat times of microsatellites [default: 1-1:10;2-5:5]")
     parser.add_argument('-t', '--threads', type=int, nargs=1, default=[4],
-                        help="Number of additional threads to use [default: 4]")
+                        help="number of additional threads to use [default: 1]")
     # parser.add_argument('-q', '--minimum_mapping_quality', type=int, nargs=1, default=[20],
     #                     help="minimum mapping quality of read [default:20]")
     # parser.add_argument('-s', '--minimum_support_reads', type=int, nargs=1, default=[20],
@@ -45,7 +45,7 @@ def argumentProcress():
     arguments["threads"] = args.threads[0]
     arguments["context_length"] = args.context_length[0]
     arguments["ranges_of_repeat_times"] = {}
-    for i in args.ranges_of_repeat_times[0].split(";"):
+    for i in args.minimum_repeat_times[0].split(";"):
         # print(i)
         unitRange, repeatRange = i.split(":")
         unitStart, unitEnd = tuple(map(int, unitRange.split("-")))
