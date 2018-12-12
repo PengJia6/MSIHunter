@@ -1,6 +1,6 @@
 # MSIhunter
 ## General introduction
-SIhunter is a python program for Microsatellites Instability (MSI) Evaluation using only tumor next generation sequencing data and accepts the whole genome sequencing, whole exome sequencing and target region sequencing data.
+MSIhunter is a python program for Microsatellites Instability (MSI) Evaluation using only tumor next generation sequencing data and accepts the whole genome sequencing, whole exome sequencing and target region sequencing data.
 
 Fisrt, MSIhunter needs to scan the whole genome or the genome region you are interested in to get the location, repeat unit, repeat length and other information of microsatellites. Second, you need some cancer cases with MSI status ( Here, the MSI status could be evaluated by PCR,click [here](https://www.ncbi.nlm.nih.gov/gtr/tests/514558/overview/) for more detail information ) and sequencing data to get a set of discriminative microsatellites and their thresholds for a specific kind of cancer. Then, you can evaluate the MSI using sequencing data and the discriminative microsatellites you selected.
 
